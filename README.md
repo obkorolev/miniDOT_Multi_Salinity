@@ -1,8 +1,9 @@
 # miniDOT Multi-Salinity Dissolved Oxygen Data Processor v1.0
-------------------------------------------------------------
+
+![Alt text](multi-salinity-DO/logo.png)
+----------------------------------------------------------------------------------------------------------------------------------------------------
 Developed by the Institute of the Marine Sciences of Andalusia (ICMAN) - CSIC and The Mediterranean Institute for Advanced Studies (IMEDEA) - CSIC.
 ----------------------------------------------------------------------------------------------------------------------------------------------------
-![Alt text](multi-salinity-DO/logo.png)
 
 An extension to the original miniDOT Concatenate by PME that allows to provide an aditional salinity file to process 
 each measurement individually, according to the registered salinity at each specific moment.
@@ -13,17 +14,17 @@ Instructions to run the program:
 
 1. Open the cmd corresponding to a python environment (for example from within Anaconda), then find the path to the files of the miniDOT Multi-Salinity Dissolved Oxygen Data Processor. To do so, type in the cmd:
 
-cd path-to-program
+`cd path-to-program`
 
-for example: cd C:\Users\Documents\ICMAN\minidot_concatenate
+for example: `cd C:\Users\Documents\ICMAN\minidot_concatenate`
 
 2. Install the requirements.txt file, to do so type in the cmd:
 
-pip install -r requirements.txt
+`pip install -r requirements.txt`
 
 3. After installation, type:
 
-python run.py
+`python run.py`
 
 4. An interface will open:
 
