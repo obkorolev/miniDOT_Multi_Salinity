@@ -2,7 +2,7 @@
 ------------------------------------------------------------
 Developed by the Institute of the Marine Sciences of Andalusia (ICMAN) - CSIC and The Mediterranean Institute for Advanced Studies (IMEDEA) - CSIC.
 ----------------------------------------------------------------------------------------------------------------------------------------------------
-![Alt text](/path/to/image.png)
+![Alt text](multi-salinity-DO/logo.png)
 
 An extension to the original miniDOT Concatenate by PME that allows to provide an aditional salinity file to process 
 each measurement individually, according to the registered salinity at each specific moment.
