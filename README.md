@@ -14,9 +14,9 @@ Instructions to run the program:
 
 1. Open the cmd corresponding to a python environment (for example from within Anaconda), then find the path to the files of the miniDOT Multi-Salinity Dissolved Oxygen Data Processor. To do so, type in the cmd:
 
-`cd path-to-program`
+`cd path-to-files\multi-salinity-DO`
 
-for example: `cd C:\Users\Documents\ICMAN\minidot_concatenate`
+for example: `cd C:\Users\Documents\ICMAN\minidot_concatenate\multi-salinity-DO`
 
 2. Install the requirements.txt file, to do so type in the cmd:
 
