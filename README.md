@@ -6,7 +6,7 @@ Developed by the Institute of the Marine Sciences of Andalusia (ICMAN) - CSIC an
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 
 An extension to the original miniDOT Concatenate by PME that allows to provide an aditional salinity file to process 
-each measurement individually, according to the registered salinity at each specific moment.
+each measurement individually, according to the registered salinity at each specific moment, obtained form another instrument.
 
 This is the first version of the program, that must be run from a cmd. (Future updates will include an exe file and maybe migration to java).
 
