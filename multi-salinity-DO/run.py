@@ -145,7 +145,7 @@ def create_gui():
     # Add question mark icon with hover tooltip for salinity file
     salinity_question_button = ctk.CTkButton(frame_input, text="?", width=10, height=10, corner_radius=10, fg_color=None, hover_color=None)
     salinity_question_button.grid(column=5, row=4, sticky=ctk.EW)
-    create_tooltip(salinity_question_button, "Your salinity file should meet the following requirements to be correctly processed: \n - It must be a .csv file. \n - It must contain a column named Salinity, containing the salinities, IN THE FIRST ROW OF THE CSV! \n of the site of measurement. \n - Salinities timestamp must be in the format %d/%m/%Y %H:%M:%S.%f.")
+    create_tooltip(salinity_question_button, "Your salinity file should meet the following requirements to be correctly processed: \n - It must be a .csv file. \n - It must contain a column named Salinity, containing the salinities, IN THE FIRST ROW OF THE CSV! \n of the site of measurement. \n - Salinities timestamp must be in the format %d/%m/%Y %H:%M:%S")
 
     # Configure the grid layout
     frame_input.grid_columnconfigure(2, weight=1)  # Allow the second column to expand and fill space
