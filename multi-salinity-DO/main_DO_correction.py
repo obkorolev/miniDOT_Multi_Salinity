@@ -135,7 +135,7 @@ def process_data(pressure_input_type, pressure_value, elevation_value, do_file_p
     data['Time'] = pd.to_datetime(data['Time'], unit='s')
     
     salinity_data = pd.read_csv(salinity_file_path)
-    salinity_data['Timestamp'] = pd.to_datetime(salinity_data['Timestamp'], format='%d/%m/%Y %H:%M:%S.%f')
+    salinity_data['Timestamp'] = pd.to_datetime(salinity_data['Timestamp'], format='%d/%m/%Y %H:%M:%S')
     data['Salinity'] = data['Time'].apply(lambda x: find_closest_salinity(x.timestamp(), salinity_data))
 
     # Initialize the processor
