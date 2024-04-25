@@ -38,7 +38,7 @@ python run.py
 requirements to be correctly processed: 
 	- It must be a .csv file. 
 	- It must contain a column named "Salinity" IN THE FIRST ROW OF THE CSV! (this is important, otherwise the program won't find the salinity data), containing the salinities of the site of measurement.
-	- Salinities timestamp must be in the format %d/%m/%Y %H:%M:%S.%f. for example 2/21/2024 19:30
+	- Salinities timestamp must be in the format dd/mm/YYYY HH:MM:SS for example 21/12/2024 19:30:00
 - Click Process Data button, a file named "DO_processed_output.csv" is then generated and saved in the folder named "outputs".
 
 
