@@ -1,13 +1,25 @@
 import tkinter as tk
+import os
+
 from tkinter import filedialog, messagebox, ttk
 import pandas as pd
-from main_DO_correction import process_all_files
+from do_correction.correction import process_all_files
 from tkinter import *
 import customtkinter as ctk
 from PIL import Image, ImageTk
 
 from tkinter import Toplevel, Label
 
+# Just add this search function:
+import sys, os
+def resource(relative_path):
+    base_path = getattr(
+        sys,
+        '_MEIPASS',
+        os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+
+# Then use this function to find the asset, eg: resource("my_file")
 class ToolTip(object):
     def __init__(self, widget, text):
         self.widget = widget
@@ -76,12 +88,12 @@ def create_gui():
     frame_input.pack(padx=30, pady=30, fill='both', expand=True)  # Use pack for the frame with padding and make it expandable
 
     # Load and display an image in the upper right corner outside the frame_input
-    image_path = "./logo.png"  # Correct path to your image
+    image_path = resource('logo.png')
     img = Image.open(image_path)
 
     # Resize the image as needed
     desired_size = (400, 30)  # Adjust (width, height) as needed
-    img = img.resize(desired_size, Image.ANTIALIAS)
+    img = img.resize(desired_size, Image.LANCZOS)
 
     photo = ImageTk.PhotoImage(img)
     image_label = ctk.CTkLabel(root, image=photo, text="")  # Add it to the root instead of frame_input

@@ -1,4 +1,0 @@
-﻿customtkinter
-numpy
-pandas
-Pillow
