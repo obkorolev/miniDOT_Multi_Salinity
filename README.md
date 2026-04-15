@@ -1,4 +1,4 @@
-# miniDOT Multi-Salinity Dissolved Oxygen Data Processor v1.0
+# miniDOT Multi-Salinity Dissolved Oxygen Data Processor v1.1
 
 ![Alt text](multi-salinity-DO/logo.png)
 ----------------------------------------------------------------------------------------------------------------------------------------------------
