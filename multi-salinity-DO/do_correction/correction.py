@@ -3,6 +3,86 @@ import pandas as pd
 import numpy as np
 import datetime
 import os
+import re
+
+# Column name mapping: various possible names -> standard names used by the processor
+COLUMN_MAPPING = {
+    'unix timestamp': 'Time (sec)',
+    'unix_timestamp': 'Time (sec)',
+    'time (sec)': 'Time (sec)',
+    'time(sec)': 'Time (sec)',
+    'temperature': 'T (deg C)',
+    't (deg c)': 'T (deg C)',
+    'dissolved oxygen': 'DO (mg/l)',
+    'do (mg/l)': 'DO (mg/l)',
+    'do(mg/l)': 'DO (mg/l)',
+}
+
+def detect_do_file_format(file_path):
+    """Auto-detect header row, separator, decimal char, and units row in a miniDOT file."""
+    header_keywords = ['unix timestamp', 'time (sec)', 'temperature', 'dissolved oxygen']
+
+    with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
+        lines = f.readlines()
+
+    # Find the header row: must match at least 2 keywords and contain a delimiter
+    header_row = None
+    for i, line in enumerate(lines):
+        lower_line = line.lower().strip()
+        matches = sum(1 for kw in header_keywords if kw in lower_line)
+        has_delimiter = ';' in line or line.count(',') >= 2
+        if matches >= 2 and has_delimiter:
+            header_row = i
+            break
+
+    if header_row is None:
+        raise ValueError(f"Could not detect column header row in {file_path}. "
+                         "Expected columns like 'Unix Timestamp', 'Time (sec)', 'Temperature', or 'Dissolved Oxygen'.")
+
+    # Detect separator
+    header_line = lines[header_row]
+    sep = ';' if header_line.count(';') > header_line.count(',') else ','
+
+    # Check if the row after header is a units row (contains parenthesized units like "(Second)", "(deg C)")
+    skip_units = False
+    if header_row + 1 < len(lines):
+        next_line = lines[header_row + 1].strip()
+        parts = [p.strip() for p in next_line.split(sep) if p.strip()]
+        if parts and all(re.match(r'^\(.*\)$', p) for p in parts):
+            skip_units = True
+
+    # Detect decimal character from first data row
+    decimal = '.'
+    data_start = header_row + 1 + (1 if skip_units else 0)
+    if data_start < len(lines):
+        data_parts = lines[data_start].split(sep)
+        for part in data_parts:
+            part = part.strip()
+            # European decimal: has comma, no period, and looks numeric
+            if ',' in part and '.' not in part:
+                try:
+                    float(part.replace(',', '.', 1))
+                    decimal = ','
+                    break
+                except ValueError:
+                    pass
+
+    # Build list of rows to skip: everything before header + units row if present
+    skiprows = list(range(header_row))
+    if skip_units:
+        skiprows.append(header_row + 1)
+
+    return skiprows, sep, decimal
+
+def normalize_do_columns(df):
+    """Map various miniDOT column names to the standard names expected by the processor."""
+    rename_map = {}
+    for col in df.columns:
+        clean = col.strip().lower()
+        if clean in COLUMN_MAPPING:
+            rename_map[col] = COLUMN_MAPPING[clean]
+    df.rename(columns=rename_map, inplace=True)
+    return df
 
 def DOConcMg(T, P, S):
     return DOConcUmol(T, P, S) * 31.9988 / 1000.0
@@ -76,11 +156,21 @@ class DODataProcessor:
     
 def process_all_files(directory_path, salinity_file_path, pressure_input_type, pressure_value, elevation_value):
     all_data = []
+    skipped = []
     for filename in os.listdir(directory_path):
-        if filename.endswith(".txt"):
+        if filename.lower().endswith(".txt"):
             file_path = os.path.join(directory_path, filename)
-            processed_data = process_data(pressure_input_type, pressure_value, elevation_value, file_path, salinity_file_path)
-            all_data.append(processed_data)
+            try:
+                processed_data = process_data(pressure_input_type, pressure_value, elevation_value, file_path, salinity_file_path)
+                all_data.append(processed_data)
+            except ValueError:
+                # Skip files that don't have a valid miniDOT data format
+                skipped.append(filename)
+
+    if not all_data:
+        raise ValueError(f"No valid miniDOT data files found in '{directory_path}'. "
+                         f"Skipped non-data files: {skipped}" if skipped else
+                         f"No .txt files found in '{directory_path}'.")
 
     # Combine all data into a single DataFrame
     combined_data = pd.concat(all_data)
@@ -129,13 +219,21 @@ def process_data(pressure_input_type, pressure_value, elevation_value, do_file_p
     else:
         raise ValueError("Invalid input type")
 
-    data = pd.read_csv(do_file_path, skiprows=2, header=0)
+    # Auto-detect miniDOT file format (header position, separator, decimal char)
+    skiprows, sep, decimal = detect_do_file_format(do_file_path)
+    data = pd.read_csv(do_file_path, skiprows=skiprows, header=0, sep=sep, decimal=decimal)
     data.columns = data.columns.str.strip()
+    normalize_do_columns(data)
     data.rename(columns={'Time (sec)': 'Time'}, inplace=True)
     data['Time'] = pd.to_datetime(data['Time'], unit='s')
-    
+
+    # Read salinity file with flexible column names and timestamp formats
     salinity_data = pd.read_csv(salinity_file_path)
-    salinity_data['Timestamp'] = pd.to_datetime(salinity_data['Timestamp'], format='%d/%m/%Y %H:%M:%S')
+    salinity_data.columns = salinity_data.columns.str.strip()
+    # Accept either 'Timestamp' or 'Time' as the datetime column
+    if 'Time' in salinity_data.columns and 'Timestamp' not in salinity_data.columns:
+        salinity_data.rename(columns={'Time': 'Timestamp'}, inplace=True)
+    salinity_data['Timestamp'] = pd.to_datetime(salinity_data['Timestamp'], dayfirst=True)
     data['Salinity'] = data['Time'].apply(lambda x: find_closest_salinity(x.timestamp(), salinity_data))
 
     # Initialize the processor
